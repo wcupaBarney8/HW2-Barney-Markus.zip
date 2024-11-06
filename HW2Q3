@@ -1,0 +1,63 @@
+import cv2
+import numpy as np
+
+def add_salt_and_pepper_noise(image, amount=0.2):
+    row, col, ch = image.shape
+    s_vs_p = 0.5
+    out = np.copy(image)
+    # Salt mode
+    num_salt = np.ceil(amount * image.size * s_vs_p)
+    coords = [np.random.randint(0, i - 1, int(num_salt))
+              for i in image.shape]
+    out[tuple(coords)] = 255
+
+    # Pepper mode
+    num_pepper = np.ceil(amount * image.size * (1. - s_vs_p))
+    coords = [np.random.randint(0, i - 1, int(num_pepper))
+              for i in image.shape]
+    out[tuple(coords)] = 0
+    return out
+
+
+def apply_filters(image):
+    # Applying box filter (average filter)
+    box_filtered = cv2.blur(image, (3, 3))
+    
+    # Applying Gaussian filter
+    gaussian_filtered = cv2.GaussianBlur(image, (3, 3), 0)
+    
+    # Applying median filter
+    median_filtered = cv2.medianBlur(image, 3)
+    
+    return box_filtered, gaussian_filtered, median_filtered
+
+
+
+# Load an image
+image = cv2.imread('dimage.jpg')
+if image is None:
+    print("Error: Image not found.")
+else:
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert to RGB
+
+    # Add noise
+    noisy_image = add_salt_and_pepper_noise(image)
+
+    # Apply filters
+    box_result, gaussian_result, median_result = apply_filters(noisy_image)
+
+    # Display the results using matplotlib for better color handling
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(10, 8))
+plt.subplot(321), plt.imshow(image), plt.title('Original')
+plt.xticks([]), plt.yticks([])
+plt.subplot(322), plt.imshow(noisy_image), plt.title('Noisy Image')
+plt.xticks([]), plt.yticks([])
+plt.subplot(323), plt.imshow(box_result), plt.title('Box Filter')
+plt.xticks([]), plt.yticks([])
+plt.subplot(324), plt.imshow(gaussian_result), plt.title('Gaussian Filter')
+plt.xticks([]), plt.yticks([])
+plt.subplot(325), plt.imshow(median_result), plt.title('Median Filter')
+plt.xticks([]), plt.yticks([])
+plt.show()
