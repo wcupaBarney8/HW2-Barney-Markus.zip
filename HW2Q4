@@ -1,0 +1,9 @@
+import numpy as np
+import cv2 as cv
+
+# Define the sequence
+x = np.array([2, 3, 4, 1], dtype=np.float32)
+
+# Compute DFT using NumPy
+f = np.fft.fft(x)
+print("DFT by NumPy:\n", f)
